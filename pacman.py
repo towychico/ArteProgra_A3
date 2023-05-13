@@ -151,7 +151,7 @@ def world():
 
 
 def move():
-    """Move pacman and all ghosts."""
+    "Move pacman and all ghosts."
     writer.undo()
     writer.write(state['score'])
 
@@ -172,20 +172,39 @@ def move():
     up()
     goto(pacman.x + 10, pacman.y + 10)
     dot(20, 'yellow')
-
+    
     for point, course in ghosts:
-        if valid(point + course):
-            point.move(course)
+        if pacman.x == point.x or pacman.y ==point.y:
+        # Move ghosts towards Pac-Man
+            if pacman.x > point.x:
+                course.x = 8
+                course.y = 0
+            elif pacman.x < point.x:
+                course.x = -8
+                course.y = 0
+            if pacman.y > point.y:
+                course.y = 8
+                course.x = 0
+            elif pacman.y < point.y:
+                course.y = -8
+                course.x = 0
+
+            if valid(point + course):
+                point.move(course)
         else:
-            options = [
-                vector(5, 0),
-                vector(-5, 0),
-                vector(0, 5),
-                vector(0, -5),
-            ]
-            plan = choice(options)
-            course.x = plan.x
-            course.y = plan.y
+            if valid(point + course):
+                point.move(course)
+            else:
+                options = [
+                    vector(8, 0),
+                    vector(-8, 0),
+                    vector(0, 8),
+                    vector(0, -8),
+                ]
+                plan = choice(options)
+                course.x = plan.x
+                course.y = plan.y
+            
 
         up()
         goto(point.x + 10, point.y + 10)
@@ -197,7 +216,7 @@ def move():
         if abs(pacman - point) < 20:
             return
 
-    ontimer(move, 100)
+    ontimer(move, 10)
 
 
 def change(x, y):
